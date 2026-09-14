@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frontend starter</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Siirry sisältöön</a>
+  <header class="site-header">
+    <p class="eyebrow">Full Stack Frontend</p>
+    <h1>Synteettinen Sytyke-demo</h1>
+  </header>
+  <main id="main">
+    <section aria-labelledby="step-title" class="card">
+      <p id="progress" aria-live="polite"></p>
+      <h2 id="step-title"></h2>
+      <p id="step-body"></p>
+      <div id="actions" class="actions"></div>
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <script type="module" src="/app.mjs"></script>
+</body>
+</html>
