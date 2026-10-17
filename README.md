@@ -79,33 +79,27 @@ The following features and capabilities are outside the scope of the entire proj
 
 ---
 
-# Full Stack Frontend -aloitusprojekti 2026.09.01
+## Project purpose
 
-Tämä Moodlesta ladattava lähtöprojekti on teknologianeutraali, riippuvuuksista vapaa selainkäyttöliittymä. Sen tarkoitus on varmistaa, että jokainen opiskelija voi aloittaa turvallisesti myös silloin, kun projektin varsinainen framework- tai yritysympäristö ei ole vielä käytettävissä.
+The application helps users find suitable accommodation, compare available options, and manage their bookings in one place. Users should be able to search and filter accommodations, view accommodation details, create bookings, and manage their own bookings.
 
-## Tuettu ympäristö
+## Target users
 
-- moderni selain
-- Node.js 24 tai uudempi paikallista palvelinta, testejä ja build-esimerkkiä varten
+**Travellers** - people who want to find accommodation that matches their location, price, and date preferences.
 
-## Käynnistys
+## Success criteria
 
-```sh
-npm start
-```
+The project will be considered successful when:
 
-Avaa selaimessa `http://localhost:8080`.
+- Users can browse accommodation listings and view accommodation details.
+- Users can filter accommodations using supported search criteria.
+- Users can register and log in.
+- Authenticated users can create, view, and cancel their own bookings.
+- The application prevents invalid bookings and unauthorized access.
+- The main booking journey can be completed without unnecessary guidance.
+- The interface works on different screen sizes and follows key accessibility principles.
+- The frontend and backend can be started, tested, and built using the documented instructions.
 
-## Tarkistus
+---
 
-```sh
-npm run lint
-npm test
-npm run build
-```
 
-Luo tiedostoista oma Git-repositorio ja tallenna ensimmäisen commitin SHA lähtötunnisteeksi. Sovita rakenne valittuun frontend-teknologiaan projektisuunnitelman hyväksymisen jälkeen.
-
-Älä tallenna repositorioon salasanoja, tokeneita, henkilötietoja, asiakastietoja, yrityksen luottamuksellista aineistoa tai tuotantolokeja. Käytä vain synteettistä testidataa.
-
-Lisenssi: Apache-2.0.
