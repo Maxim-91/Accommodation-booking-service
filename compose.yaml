@@ -1,0 +1,22 @@
+
+services:
+  db:
+    image: postgres:17
+    container_name: accommodation-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: accommodation_db
+      POSTGRES_USER: accommodation_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the root .env file}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U accommodation_user -d accommodation_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
