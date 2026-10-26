@@ -5,9 +5,7 @@ from sqlalchemy.orm import Session
 
 from models import Accommodation, Booking
 from custom_exceptions.not_found_exception import NotFoundException
-from custom_exceptions.booking_conflict_exception import (
-    BookingConflictException,
-)
+from custom_exceptions.booking_conflict_exception import BookingConflictException
 
 
 class BookingService:
@@ -83,6 +81,44 @@ class BookingService:
 
         try:
             self._repository.add(booking)
+            self._repository.commit()
+            self._repository.refresh(booking)
+            return booking
+        except Exception:
+            self._repository.rollback()
+            raise
+
+    def get_bookings_by_user(self, user_id: int) -> list[Booking]:
+        statement = (
+            select(Booking)
+            .where(Booking.user_id == user_id)
+            .order_by(Booking.created_at.desc())
+        )
+
+        return list(self._repository.scalars(statement).all())
+
+    def cancel_booking(
+            self,
+            *,
+            booking_id: int,
+            user_id: int,
+    ) -> Booking:
+        statement = select(Booking).where(
+            Booking.id == booking_id,
+            Booking.user_id == user_id,
+        )
+
+        booking = self._repository.scalars(statement).first()
+
+        if booking is None:
+            raise NotFoundException("Booking not found")
+
+        if booking.status == "cancelled":
+            raise BookingConflictException("Booking is already cancelled")
+
+        booking.status = "cancelled"
+
+        try:
             self._repository.commit()
             self._repository.refresh(booking)
             return booking
