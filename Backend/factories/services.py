@@ -6,6 +6,7 @@ from services.accommodation_service import AccommodationService
 from services.user_service import UserService
 from tools.abc_token_tool import ABCTokenTool
 from tools.symmetric_token_tool import SymmetricTokenTool
+from services.booking_service import BookingService
 
 
 def token_tool_factory() -> ABCTokenTool:
@@ -21,3 +22,8 @@ def user_service_factory(
     token_tool: ABCTokenTool = Depends(token_tool_factory),
 ) -> UserService:
     return UserService(repository, token_tool)
+
+def booking_service_factory(
+    repository: Session = Depends(get_db),
+) -> BookingService:
+    return BookingService(repository)
