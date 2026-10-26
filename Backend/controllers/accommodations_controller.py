@@ -3,14 +3,15 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from custom_exceptions.not_found_exception import NotFoundException
+from dependencies import get_logged_in_user
 from dtos.accommodations import (
     AccommodationDto,
     CreateAccommodationReq,
     UpdateAccommodationReq,
 )
 from factories.services import accommodation_service_factory
+from models import User
 from services.accommodation_service import AccommodationService
-
 
 router = APIRouter(
     prefix="/api/accommodations",
@@ -21,6 +22,8 @@ AccommodationServ = Annotated[
     AccommodationService,
     Depends(accommodation_service_factory),
 ]
+
+CurrentUser = Annotated[User, Depends(get_logged_in_user)]
 
 
 @router.get("/", response_model=list[AccommodationDto])
@@ -54,9 +57,13 @@ def get_accommodation_by_id(
 )
 def create_accommodation(
     request: CreateAccommodationReq,
+    current_user: CurrentUser,
     service: AccommodationServ,
 ) -> AccommodationDto:
-    return service.create(request)
+    return service.create(
+        request,
+        owner_id=current_user.id,
+    )
 
 
 @router.put(
@@ -92,3 +99,4 @@ def delete_accommodation(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(error),
         ) from error
+    
