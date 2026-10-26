@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 # this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+# access to the values within the .ini file in use
 config = context.config
 
 import os
@@ -15,13 +15,18 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Add Backend to Python's import path.
+# Add Backend to Python's import path
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 ROOT_DIR = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(BACKEND_DIR))
 
+# Make Backend modules importable when Alembic runs
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
+# Load the local environment configuration
 load_dotenv(ROOT_DIR / ".env")
 
+# Import Base and all model classes
 from database import Base
 import models  # noqa: F401
 
@@ -29,12 +34,13 @@ database_url = os.getenv("DATABASE_URL")
 if not database_url:
     raise RuntimeError("DATABASE_URL is not set in the root .env file")
 
+# Percent signs must be escaped for ConfigParser
 config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 
 target_metadata = Base.metadata
 
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
+# This line sets up loggers basically
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
