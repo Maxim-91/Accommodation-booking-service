@@ -3,6 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from controllers.accommodations_controller import router as accommodations_router
 from controllers.auth_controller import router as auth_router
+from controllers.bookings_controller import router as bookings_router
 from database import engine
 
 from pathlib import Path
@@ -16,10 +17,11 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 app = FastAPI(
     title="Accommodation Booking Service API",
-    version="0.1.4",
+    version="0.1.5",
 )
 app.include_router(accommodations_router)
 app.include_router(auth_router)
+app.include_router(bookings_router)
 
 @app.get("/health", tags=["Health"])
 def health_check() -> dict[str, str]:
