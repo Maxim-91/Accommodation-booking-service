@@ -96,4 +96,32 @@ class BookingService:
         )
 
         return list(self._repository.scalars(statement).all())
-    
+
+    def cancel_booking(
+            self,
+            *,
+            booking_id: int,
+            user_id: int,
+    ) -> Booking:
+        statement = select(Booking).where(
+            Booking.id == booking_id,
+            Booking.user_id == user_id,
+        )
+
+        booking = self._repository.scalars(statement).first()
+
+        if booking is None:
+            raise NotFoundException("Booking not found")
+
+        if booking.status == "cancelled":
+            raise BookingConflictException("Booking is already cancelled")
+
+        booking.status = "cancelled"
+
+        try:
+            self._repository.commit()
+            self._repository.refresh(booking)
+            return booking
+        except Exception:
+            self._repository.rollback()
+            raise
