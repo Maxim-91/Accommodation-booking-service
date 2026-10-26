@@ -45,3 +45,14 @@ def create_booking(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),
         ) from error
+
+@router.get("/", response_model=list[BookingResponse])
+def get_my_bookings(
+    current_user: User = Depends(get_logged_in_user),
+    service: BookingService = Depends(booking_service_factory),
+) -> list[BookingResponse]:
+    bookings = service.get_bookings_by_user(current_user.id)
+    return [
+        BookingResponse.model_validate(booking)
+        for booking in bookings
+    ]
