@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from custom_exceptions.forbidden_exception import ForbiddenException
 from custom_exceptions.not_found_exception import NotFoundException
 from dtos.accommodations import (
     CreateAccommodationReq,
@@ -29,30 +30,70 @@ class AccommodationService:
 
         return accommodation
 
-    def create(
-        self, request: CreateAccommodationReq
+    def get_owned_by_id(
+        self,
+        accommodation_id: int,
+        owner_id: int,
     ) -> Accommodation:
-        accommodation = Accommodation(**request.model_dump())
+        accommodation = self.get_by_id(accommodation_id)
+
+        if accommodation.owner_id != owner_id:
+            raise ForbiddenException("You do not own this accommodation")
+
+        return accommodation
+
+    def create(
+        self,
+        request: CreateAccommodationReq,
+        owner_id: int,
+    ) -> Accommodation:
+        accommodation = Accommodation(
+            title=request.title,
+            description=request.description,
+            location=request.location,
+            price_per_night=request.price_per_night,
+            max_guests=request.max_guests,
+            is_active=request.is_active,
+            owner_id=owner_id,
+        )
+
         self._repository.add(accommodation)
         self._repository.commit()
         self._repository.refresh(accommodation)
+
         return accommodation
 
     def update(
         self,
         accommodation_id: int,
         request: UpdateAccommodationReq,
+        owner_id: int,
     ) -> Accommodation:
-        accommodation = self.get_by_id(accommodation_id)
+        accommodation = self.get_owned_by_id(
+            accommodation_id,
+            owner_id,
+        )
 
-        for field, value in request.model_dump().items():
-            setattr(accommodation, field, value)
+        accommodation.title = request.title
+        accommodation.description = request.description
+        accommodation.location = request.location
+        accommodation.price_per_night = request.price_per_night
+        accommodation.max_guests = request.max_guests
+        accommodation.is_active = request.is_active
 
         self._repository.commit()
         self._repository.refresh(accommodation)
         return accommodation
 
-    def delete(self, accommodation_id: int) -> None:
-        accommodation = self.get_by_id(accommodation_id)
+    def delete(
+        self,
+        accommodation_id: int,
+        owner_id: int,
+    ) -> None:
+        accommodation = self.get_owned_by_id(
+            accommodation_id,
+            owner_id,
+        )
+
         self._repository.delete(accommodation)
         self._repository.commit()

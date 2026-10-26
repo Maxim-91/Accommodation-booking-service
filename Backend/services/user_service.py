@@ -1,3 +1,4 @@
+import jwt
 from passlib.hash import argon2
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -77,3 +78,13 @@ class UserService:
             raise UnauthorizedException("Invalid email or password")
 
         return self._token_tool.create_token(user)
+
+    def get_user_by_access_token(self, access_token: str) -> User | None:
+        try:
+            payload = self._token_tool.decode_token(access_token)
+            user_id = int(payload["sub"])
+        except (jwt.PyJWTError, KeyError, TypeError, ValueError):
+            return None
+
+        statement = select(User).where(User.id == user_id)
+        return self._repository.scalars(statement).first()

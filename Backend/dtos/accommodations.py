@@ -28,9 +28,6 @@ class CreateAccommodationReq(BaseModel):
     max_guests: int = Field(gt=0)
     is_active: bool = True
 
-    # Temporarily, while issues #9–#11 are not yet implemented
-    owner_id: int = Field(gt=0)
-
 
 class UpdateAccommodationReq(BaseModel):
     title: str = Field(min_length=1, max_length=200)
