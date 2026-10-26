@@ -39,4 +39,3 @@ def register_user(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),
         ) from error
-    
