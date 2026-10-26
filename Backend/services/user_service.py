@@ -1,0 +1,52 @@
+from passlib.hash import argon2
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
+from custom_exceptions.conflict_exception import ConflictException
+from models import User
+
+
+class UserService:
+    def __init__(self, repository: Session) -> None:
+        self._repository = repository
+
+    def get_by_email(self, email: str) -> User | None:
+        statement = select(User).where(User.email == email)
+        return self._repository.scalars(statement).first()
+
+    def register(
+        self,
+        full_name: str,
+        email: str,
+        password: str,
+    ) -> User:
+        normalized_email = email.strip().lower()
+
+        if self.get_by_email(normalized_email) is not None:
+            raise ConflictException("Email is already registered")
+
+        password_hash = argon2.hash(password)
+
+        user = User(
+            full_name=full_name.strip(),
+            email=normalized_email,
+            password_hash=password_hash,
+        )
+
+        try:
+            self._repository.add(user)
+            self._repository.commit()
+            self._repository.refresh(user)
+            return user
+        except IntegrityError as error:
+            self._repository.rollback()
+
+            # A unique database constraint provides additional protection against
+            # simultaneous registration requests for the same email
+            raise ConflictException(
+                "Email is already registered"
+            ) from error
+        except Exception:
+            self._repository.rollback()
+            raise

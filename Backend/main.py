@@ -2,13 +2,15 @@ from fastapi import FastAPI, HTTPException
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from controllers.accommodations_controller import router as accommodations_router
+from controllers.auth_controller import router as auth_router
 from database import engine
 
 app = FastAPI(
     title="Accommodation Booking Service API",
-    version="0.1.2",
+    version="0.1.3",
 )
 app.include_router(accommodations_router)
+app.include_router(auth_router)
 
 @app.get("/health", tags=["Health"])
 def health_check() -> dict[str, str]:
