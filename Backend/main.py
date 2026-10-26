@@ -6,7 +6,7 @@ from database import engine
 
 app = FastAPI(
     title="Accommodation Booking Service API",
-    version="0.1.1",
+    version="0.1.2",
 )
 app.include_router(accommodations_router)
 
