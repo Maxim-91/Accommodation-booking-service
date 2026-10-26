@@ -29,13 +29,21 @@ class AccommodationService:
 
         return accommodation
 
-    def create(
-        self, request: CreateAccommodationReq
-    ) -> Accommodation:
-        accommodation = Accommodation(**request.model_dump())
+    def create(self, request, owner_id: int):
+        accommodation = Accommodation(
+            title=request.title,
+            description=request.description,
+            location=request.location,
+            price_per_night=request.price_per_night,
+            max_guests=request.max_guests,
+            is_active=request.is_active,
+            owner_id=owner_id,
+        )
+
         self._repository.add(accommodation)
         self._repository.commit()
         self._repository.refresh(accommodation)
+
         return accommodation
 
     def update(
