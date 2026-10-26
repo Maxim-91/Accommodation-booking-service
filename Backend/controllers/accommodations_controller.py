@@ -119,4 +119,3 @@ def delete_accommodation(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(error),
         ) from error
-    
