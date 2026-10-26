@@ -5,9 +5,18 @@ from controllers.accommodations_controller import router as accommodations_route
 from controllers.auth_controller import router as auth_router
 from database import engine
 
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Locate the project root (move up one level from main.py)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+# Loading .env directly from the root folder
+load_dotenv(PROJECT_ROOT / ".env")
+
 app = FastAPI(
     title="Accommodation Booking Service API",
-    version="0.1.3",
+    version="0.1.4",
 )
 app.include_router(accommodations_router)
 app.include_router(auth_router)
