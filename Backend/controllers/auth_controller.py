@@ -54,10 +54,10 @@ def login_user(
             email=str(request.email),
             password=request.password,
         )
-        return LoginResponse(access_token=token, token_type="bearer")
+        return LoginResponse(access_token=token)
     except UnauthorizedException as error:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(error),
+            detail="Invalid email or password",
             headers={"WWW-Authenticate": "Bearer"},
         ) from error
