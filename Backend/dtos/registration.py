@@ -16,4 +16,3 @@ class RegistrationResponse(BaseModel):
     full_name: str
     email: EmailStr
     created_at: datetime
-    
