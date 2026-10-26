@@ -97,4 +97,3 @@ class AccommodationService:
 
         self._repository.delete(accommodation)
         self._repository.commit()
-        
