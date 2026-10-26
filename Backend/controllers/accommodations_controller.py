@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from custom_exceptions.forbidden_exception import ForbiddenException
 from custom_exceptions.not_found_exception import NotFoundException
 from dependencies import get_logged_in_user
 from dtos.accommodations import (
@@ -73,13 +74,23 @@ def create_accommodation(
 def update_accommodation(
     accommodation_id: int,
     request: UpdateAccommodationReq,
+    current_user: CurrentUser,
     service: AccommodationServ,
 ) -> AccommodationDto:
     try:
-        return service.update(accommodation_id, request)
+        return service.update(
+            accommodation_id,
+            request,
+            owner_id=current_user.id,
+        )
     except NotFoundException as error:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error),
+        ) from error
+    except ForbiddenException as error:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=str(error),
         ) from error
 
@@ -90,13 +101,22 @@ def update_accommodation(
 )
 def delete_accommodation(
     accommodation_id: int,
+    current_user: CurrentUser,
     service: AccommodationServ,
 ) -> None:
     try:
-        service.delete(accommodation_id)
+        service.delete(
+            accommodation_id,
+            owner_id=current_user.id,
+        )
     except NotFoundException as error:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error),
+        ) from error
+    except ForbiddenException as error:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=str(error),
         ) from error
     
