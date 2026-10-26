@@ -87,3 +87,13 @@ class BookingService:
         except Exception:
             self._repository.rollback()
             raise
+
+    def get_bookings_by_user(self, user_id: int) -> list[Booking]:
+        statement = (
+            select(Booking)
+            .where(Booking.user_id == user_id)
+            .order_by(Booking.created_at.desc())
+        )
+
+        return list(self._repository.scalars(statement).all())
+    
