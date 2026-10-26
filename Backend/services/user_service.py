@@ -4,12 +4,19 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from custom_exceptions.conflict_exception import ConflictException
+from custom_exceptions.unauthorized_exception import UnauthorizedException
 from models import User
+from tools.abc_token_tool import ABCTokenTool
 
 
 class UserService:
-    def __init__(self, repository: Session) -> None:
+    def __init__(
+        self,
+        repository: Session,
+        token_tool: ABCTokenTool,
+    ) -> None:
         self._repository = repository
+        self._token_tool = token_tool
 
     def get_by_email(self, email: str) -> User | None:
         statement = select(User).where(User.email == email)
@@ -50,3 +57,23 @@ class UserService:
         except Exception:
             self._repository.rollback()
             raise
+
+    def login(self, email: str, password: str) -> str:
+        normalized_email = email.strip().lower()
+        user = self.get_by_email(normalized_email)
+
+        if user is None:
+            raise UnauthorizedException("Invalid email or password")
+
+        try:
+            password_is_valid = argon2.verify(
+                password,
+                user.password_hash,
+            )
+        except (TypeError, ValueError):
+            password_is_valid = False
+
+        if not password_is_valid:
+            raise UnauthorizedException("Invalid email or password")
+
+        return self._token_tool.create_token(user)
