@@ -5,9 +5,7 @@ from sqlalchemy.orm import Session
 
 from models import Accommodation, Booking
 from custom_exceptions.not_found_exception import NotFoundException
-from custom_exceptions.booking_conflict_exception import (
-    BookingConflictException,
-)
+from custom_exceptions.booking_conflict_exception import BookingConflictException
 
 
 class BookingService:
