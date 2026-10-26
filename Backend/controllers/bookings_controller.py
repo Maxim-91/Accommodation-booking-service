@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from custom_exceptions.booking_conflict_exception import (
-    BookingConflictException,
-)
+from custom_exceptions.booking_conflict_exception import BookingConflictException
 from custom_exceptions.not_found_exception import NotFoundException
 from dependencies import get_logged_in_user
 from dtos.bookings import CreateBookingRequest, BookingResponse
@@ -56,3 +54,32 @@ def get_my_bookings(
         BookingResponse.model_validate(booking)
         for booking in bookings
     ]
+
+@router.delete(
+    "/{booking_id}",
+    response_model=BookingResponse,
+    status_code=status.HTTP_200_OK,
+)
+def cancel_my_booking(
+    booking_id: int,
+    current_user: User = Depends(get_logged_in_user),
+    service: BookingService = Depends(booking_service_factory),
+) -> BookingResponse:
+    try:
+        booking = service.cancel_booking(
+            booking_id=booking_id,
+            user_id=current_user.id,
+        )
+        return BookingResponse.model_validate(booking)
+
+    except NotFoundException as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Booking not found",
+        ) from error
+
+    except BookingConflictException as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
