@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
+from dtos.amenities import AmenityDto
 
 
 class AccommodationDto(BaseModel):
@@ -14,6 +15,7 @@ class AccommodationDto(BaseModel):
     location: str
     price_per_night: Decimal
     max_guests: int
+    amenities: list[AmenityDto] = Field(default_factory=list)
     is_active: bool
     created_at: datetime
 
@@ -26,6 +28,7 @@ class CreateAccommodationReq(BaseModel):
         gt=0, max_digits=10, decimal_places=2
     )
     max_guests: int = Field(gt=0)
+    amenity_ids: list[int] = Field(default_factory=list)
     is_active: bool = True
 
 
@@ -37,4 +40,5 @@ class UpdateAccommodationReq(BaseModel):
         gt=0, max_digits=10, decimal_places=2
     )
     max_guests: int = Field(gt=0)
+    amenity_ids: list[int] = Field(default_factory=list)
     is_active: bool = True

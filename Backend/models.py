@@ -2,6 +2,8 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from sqlalchemy import (
+    Table,
+    Column,
     Boolean,
     CheckConstraint,
     Date,
@@ -16,6 +18,20 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
 
+accommodation_amenities = Table(
+    "accommodation_amenities",
+    Base.metadata,
+    Column(
+        "accommodation_id",
+        ForeignKey("accommodations.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "amenity_id",
+        ForeignKey("amenities.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+)
 
 class User(Base):
     __tablename__ = "users"
@@ -91,12 +107,15 @@ class Accommodation(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-
     owner: Mapped["User"] = relationship(
         back_populates="accommodations",
     )
     bookings: Mapped[list["Booking"]] = relationship(
         back_populates="accommodation",
+    )
+    amenities: Mapped[list["Amenity"]] = relationship(
+        secondary=accommodation_amenities,
+        back_populates="accommodations",
     )
 
 
@@ -152,4 +171,20 @@ class Booking(Base):
     )
     accommodation: Mapped["Accommodation"] = relationship(
         back_populates="bookings",
+    )
+
+class Amenity(Base):
+    __tablename__ = "amenities"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+
+    accommodations: Mapped[list["Accommodation"]] = relationship(
+        secondary=accommodation_amenities,
+        back_populates="amenities",
     )
