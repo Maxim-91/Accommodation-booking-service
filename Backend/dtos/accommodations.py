@@ -4,7 +4,6 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
 from dtos.amenities import AmenityDto
 
-
 class AccommodationDto(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -24,9 +23,7 @@ class CreateAccommodationReq(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str | None = None
     location: str = Field(min_length=1, max_length=255)
-    price_per_night: Decimal = Field(
-        gt=0, max_digits=10, decimal_places=2
-    )
+    price_per_night: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
     max_guests: int = Field(gt=0)
     amenity_ids: list[int] = Field(default_factory=list)
     is_active: bool = True
@@ -36,9 +33,7 @@ class UpdateAccommodationReq(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str | None = None
     location: str = Field(min_length=1, max_length=255)
-    price_per_night: Decimal = Field(
-        gt=0, max_digits=10, decimal_places=2
-    )
+    price_per_night: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
     max_guests: int = Field(gt=0)
     amenity_ids: list[int] = Field(default_factory=list)
     is_active: bool = True

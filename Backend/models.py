@@ -53,7 +53,6 @@ class User(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-
     accommodations: Mapped[list["Accommodation"]] = relationship(
         back_populates="owner",
     )
@@ -165,7 +164,6 @@ class Booking(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-
     user: Mapped["User"] = relationship(
         back_populates="bookings",
     )
@@ -183,7 +181,6 @@ class Amenity(Base):
         unique=True,
         index=True,
     )
-
     accommodations: Mapped[list["Accommodation"]] = relationship(
         secondary=accommodation_amenities,
         back_populates="amenities",
