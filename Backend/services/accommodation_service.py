@@ -1,13 +1,10 @@
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from custom_exceptions.forbidden_exception import ForbiddenException
 from custom_exceptions.not_found_exception import NotFoundException
-from dtos.accommodations import (
-    CreateAccommodationReq,
-    UpdateAccommodationReq,
-)
+from dtos.accommodations import CreateAccommodationReq, UpdateAccommodationReq
 from models import Accommodation, Amenity
 
 
@@ -16,18 +13,25 @@ class AccommodationService:
         self._repository = repository
 
     def get_all(self) -> list[Accommodation]:
-        statement = select(Accommodation).order_by(Accommodation.id)
+        statement = (
+            select(Accommodation)
+            .options(selectinload(Accommodation.amenities))
+            .order_by(Accommodation.id)
+        )
+
         return list(self._repository.scalars(statement).all())
 
     def get_by_id(self, accommodation_id: int) -> Accommodation:
-        accommodation = self._repository.get(
-            Accommodation, accommodation_id
+        statement = (
+            select(Accommodation)
+            .options(selectinload(Accommodation.amenities))
+            .where(Accommodation.id == accommodation_id)
         )
 
+        accommodation = self._repository.scalars(statement).first()
+
         if accommodation is None:
-            raise NotFoundException(
-                f"Accommodation {accommodation_id} not found"
-            )
+            raise NotFoundException(f"Accommodation {accommodation_id} not found")
 
         return accommodation
 
@@ -39,9 +43,7 @@ class AccommodationService:
         accommodation = self.get_by_id(accommodation_id)
 
         if accommodation.owner_id != owner_id:
-            raise ForbiddenException(
-                "You do not own this accommodation"
-            )
+            raise ForbiddenException("You do not own this accommodation")
 
         return accommodation
 
@@ -66,12 +68,14 @@ class AccommodationService:
         try:
             self._repository.add(accommodation)
             self._repository.commit()
-            self._repository.refresh(accommodation)
+            #self._repository.refresh(accommodation)
         except Exception:
             self._repository.rollback()
             raise
 
-        return accommodation
+        accommodation_id = accommodation.id
+        #return accommodation
+        return self.get_by_id(accommodation_id)
 
     def update(
         self,
@@ -79,10 +83,7 @@ class AccommodationService:
         request: UpdateAccommodationReq,
         owner_id: int,
     ) -> Accommodation:
-        accommodation = self.get_owned_by_id(
-            accommodation_id,
-            owner_id,
-        )
+        accommodation = self.get_owned_by_id(accommodation_id, owner_id)
 
         amenities = self._get_amenities_by_ids(request.amenity_ids)
 
@@ -96,22 +97,21 @@ class AccommodationService:
 
         try:
             self._repository.commit()
-            self._repository.refresh(accommodation)
+            #self._repository.refresh(accommodation)
         except Exception:
             self._repository.rollback()
             raise
 
-        return accommodation
+        accommodation_id = accommodation.id
+        #return accommodation
+        return self.get_by_id(accommodation_id)
 
     def delete(
         self,
         accommodation_id: int,
         owner_id: int,
     ) -> None:
-        accommodation = self.get_owned_by_id(
-            accommodation_id,
-            owner_id,
-        )
+        accommodation = self.get_owned_by_id(accommodation_id, owner_id)
 
         try:
             self._repository.delete(accommodation)
@@ -129,14 +129,10 @@ class AccommodationService:
         if not unique_ids:
             return []
 
-        statement = select(Amenity).where(
-            Amenity.id.in_(unique_ids)
-        )
+        statement = select(Amenity).where(Amenity.id.in_(unique_ids))
         amenities = list(self._repository.scalars(statement).all())
 
         if len(amenities) != len(unique_ids):
-            raise NotFoundException(
-                "One or more amenities were not found"
-            )
+            raise NotFoundException("One or more amenities were not found")
 
         return amenities
