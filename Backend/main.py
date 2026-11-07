@@ -35,7 +35,4 @@ def database_health_check() -> dict[str, str]:
             connection.execute(text("SELECT 1"))
         return {"status": "ok", "database": "connected"}
     except SQLAlchemyError:
-        raise HTTPException(
-            status_code=503,
-            detail="Database connection failed",
-        )
+        raise HTTPException(status_code=503, detail="Database connection failed")
