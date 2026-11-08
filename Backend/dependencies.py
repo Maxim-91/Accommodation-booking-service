@@ -9,10 +9,7 @@ from services.user_service import UserService
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
-UserServ = Annotated[
-    UserService,
-    Depends(user_service_factory),
-]
+UserServ = Annotated[UserService, Depends(user_service_factory)]
 
 
 def get_logged_in_user(
@@ -29,9 +26,7 @@ def get_logged_in_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = user_service.get_user_by_access_token(
-        authorization.credentials
-    )
+    user = user_service.get_user_by_access_token(authorization.credentials)
 
     if user is None:
         raise HTTPException(

@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -18,10 +17,7 @@ if not DATABASE_URL:
         "Add it to the root .env file."
     )
 
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
-)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 SessionLocal = sessionmaker(
     bind=engine,

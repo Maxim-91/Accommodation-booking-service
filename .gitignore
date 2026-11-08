@@ -16,3 +16,7 @@ htmlcov/
 # IDE settings
 .idea/
 *.iml
+
+# RSA key by OpenSSL
+# (only the public key is published, not the private key)
+Backend/private_key.pem
