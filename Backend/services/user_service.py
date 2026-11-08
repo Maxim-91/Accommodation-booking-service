@@ -3,7 +3,6 @@ from passlib.hash import argon2
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
 from custom_exceptions.conflict_exception import ConflictException
 from custom_exceptions.unauthorized_exception import UnauthorizedException
 from models import User
@@ -52,9 +51,7 @@ class UserService:
 
             # A unique database constraint provides additional protection against
             # simultaneous registration requests for the same email
-            raise ConflictException(
-                "Email is already registered"
-            ) from error
+            raise ConflictException("Email is already registered") from error
         except Exception:
             self._repository.rollback()
             raise
@@ -67,10 +64,7 @@ class UserService:
             raise UnauthorizedException("Invalid email or password")
 
         try:
-            password_is_valid = argon2.verify(
-                password,
-                user.password_hash,
-            )
+            password_is_valid = argon2.verify(password, user.password_hash)
         except (TypeError, ValueError):
             password_is_valid = False
 
