@@ -6,7 +6,6 @@ sys.path.insert(0, str(BACKEND_DIR))
 
 from sqlalchemy import event, select
 from sqlalchemy.orm import Session, selectinload
-
 from database import engine
 from models import Accommodation
 
