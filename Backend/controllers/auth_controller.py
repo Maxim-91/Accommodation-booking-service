@@ -1,9 +1,5 @@
 from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, status
-
-from custom_exceptions.conflict_exception import ConflictException
-from custom_exceptions.unauthorized_exception import UnauthorizedException
+from fastapi import APIRouter, Depends, status
 from dtos.login import LoginRequest, LoginResponse
 from dtos.registration import RegistrationRequest, RegistrationResponse
 from factories.services import user_service_factory
@@ -21,23 +17,9 @@ UserServiceDep = Annotated[UserService, Depends(user_service_factory)]
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user",
 )
-def register_user(
-    request: RegistrationRequest,
-    service: UserServiceDep,
-) -> RegistrationResponse:
-    try:
-        user = service.register(
-            full_name=request.full_name,
-            email=str(request.email),
-            password=request.password,
-        )
-        return user
-    except ConflictException as error:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(error),
-        ) from error
-
+def register_user(request: RegistrationRequest, service: UserServiceDep) -> RegistrationResponse:
+    user = service.register(full_name=request.full_name, email=str(request.email), password=request.password)
+    return user
 
 @router.post(
     "/login",
@@ -45,19 +27,6 @@ def register_user(
     status_code=status.HTTP_200_OK,
     summary="User login",
 )
-def login_user(
-    request: LoginRequest,
-    service: UserServiceDep,
-) -> LoginResponse:
-    try:
-        token = service.login(
-            email=str(request.email),
-            password=request.password,
-        )
-        return LoginResponse(access_token=token)
-    except UnauthorizedException as error:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from error
+def login_user(request: LoginRequest, service: UserServiceDep) -> LoginResponse:
+    token = service.login(email=str(request.email), password=request.password)
+    return LoginResponse(access_token=token)

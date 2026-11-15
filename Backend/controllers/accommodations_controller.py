@@ -1,9 +1,5 @@
 from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, status
-
-from custom_exceptions.forbidden_exception import ForbiddenException
-from custom_exceptions.not_found_exception import NotFoundException
+from fastapi import APIRouter, Depends, status
 from dependencies import get_logged_in_user
 from dtos.accommodations import AccommodationDto, CreateAccommodationReq, UpdateAccommodationReq
 from factories.services import accommodation_service_factory
@@ -22,17 +18,10 @@ def get_all_accommodations(service: AccommodationServ) -> list[AccommodationDto]
 
 @router.get("/{accommodation_id}", response_model=AccommodationDto)
 def get_accommodation_by_id(accommodation_id: int, service: AccommodationServ) -> AccommodationDto:
-    try:
-        return service.get_by_id(accommodation_id)
-    except NotFoundException as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    return service.get_by_id(accommodation_id)
 
 
-@router.post(
-    "/",
-    response_model=AccommodationDto,
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post("/", response_model=AccommodationDto, status_code=status.HTTP_201_CREATED)
 def create_accommodation(
     request: CreateAccommodationReq,
     current_user: CurrentUser,
@@ -48,16 +37,7 @@ def update_accommodation(
     current_user: CurrentUser,
     service: AccommodationServ,
 ) -> AccommodationDto:
-    try:
-        return service.update(
-            accommodation_id,
-            request,
-            owner_id=current_user.id,
-        )
-    except NotFoundException as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
-    except ForbiddenException as error:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(error)) from error
+    return service.update(accommodation_id, request, owner_id=current_user.id)
 
 
 @router.delete("/{accommodation_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -66,9 +46,4 @@ def delete_accommodation(
     current_user: CurrentUser,
     service: AccommodationServ,
 ) -> None:
-    try:
-        service.delete(accommodation_id, owner_id=current_user.id)
-    except NotFoundException as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
-    except ForbiddenException as error:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(error)) from error
+    service.delete(accommodation_id, owner_id=current_user.id)

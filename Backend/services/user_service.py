@@ -10,11 +10,7 @@ from tools.abc_token_tool import ABCTokenTool
 
 
 class UserService:
-    def __init__(
-        self,
-        repository: Session,
-        token_tool: ABCTokenTool,
-    ) -> None:
+    def __init__(self, repository: Session, token_tool: ABCTokenTool) -> None:
         self._repository = repository
         self._token_tool = token_tool
 
@@ -22,12 +18,7 @@ class UserService:
         statement = select(User).where(User.email == email)
         return self._repository.scalars(statement).first()
 
-    def register(
-        self,
-        full_name: str,
-        email: str,
-        password: str,
-    ) -> User:
+    def register(self, full_name: str, email: str, password: str) -> User:
         normalized_email = email.strip().lower()
 
         if self.get_by_email(normalized_email) is not None:
@@ -35,11 +26,7 @@ class UserService:
 
         password_hash = argon2.hash(password)
 
-        user = User(
-            full_name=full_name.strip(),
-            email=normalized_email,
-            password_hash=password_hash,
-        )
+        user = User(full_name=full_name.strip(), email=normalized_email, password_hash=password_hash)
 
         try:
             self._repository.add(user)
