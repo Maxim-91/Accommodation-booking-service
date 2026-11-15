@@ -1,7 +1,5 @@
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
-
 from custom_exceptions.forbidden_exception import ForbiddenException
 from custom_exceptions.not_found_exception import NotFoundException
 from dtos.accommodations import CreateAccommodationReq, UpdateAccommodationReq
@@ -35,11 +33,7 @@ class AccommodationService:
 
         return accommodation
 
-    def get_owned_by_id(
-        self,
-        accommodation_id: int,
-        owner_id: int,
-    ) -> Accommodation:
+    def get_owned_by_id(self, accommodation_id: int, owner_id: int) -> Accommodation:
         accommodation = self.get_by_id(accommodation_id)
 
         if accommodation.owner_id != owner_id:
@@ -47,11 +41,7 @@ class AccommodationService:
 
         return accommodation
 
-    def create(
-        self,
-        request: CreateAccommodationReq,
-        owner_id: int,
-    ) -> Accommodation:
+    def create(self, request: CreateAccommodationReq, owner_id: int) -> Accommodation:
         amenities = self._get_amenities_by_ids(request.amenity_ids)
 
         accommodation = Accommodation(
@@ -77,12 +67,7 @@ class AccommodationService:
         #return accommodation
         return self.get_by_id(accommodation_id)
 
-    def update(
-        self,
-        accommodation_id: int,
-        request: UpdateAccommodationReq,
-        owner_id: int,
-    ) -> Accommodation:
+    def update(self, accommodation_id: int, request: UpdateAccommodationReq, owner_id: int) -> Accommodation:
         accommodation = self.get_owned_by_id(accommodation_id, owner_id)
 
         amenities = self._get_amenities_by_ids(request.amenity_ids)
@@ -106,11 +91,7 @@ class AccommodationService:
         #return accommodation
         return self.get_by_id(accommodation_id)
 
-    def delete(
-        self,
-        accommodation_id: int,
-        owner_id: int,
-    ) -> None:
+    def delete(self, accommodation_id: int, owner_id: int) -> None:
         accommodation = self.get_owned_by_id(accommodation_id, owner_id)
 
         try:
@@ -120,10 +101,7 @@ class AccommodationService:
             self._repository.rollback()
             raise
 
-    def _get_amenities_by_ids(
-        self,
-        amenity_ids: list[int],
-    ) -> list[Amenity]:
+    def _get_amenities_by_ids(self, amenity_ids: list[int]) -> list[Amenity]:
         unique_ids = set(amenity_ids)
 
         if not unique_ids:
