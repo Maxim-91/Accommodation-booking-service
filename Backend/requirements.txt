@@ -2,6 +2,7 @@ fastapi[standard]
 sqlalchemy
 alembic
 psycopg[binary]
+psycopg2-binary
 python-dotenv
 passlib[argon2]
 pyjwt[crypto]
