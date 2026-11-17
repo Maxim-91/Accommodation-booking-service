@@ -12,13 +12,12 @@ import jwt
 
 class UserServiceTests(unittest.TestCase):
 
-    # def setUp for close the session
     def setUp(self):
         self.engine, self.session = create_test_session()
         self.token_tool = Mock(spec=ABCTokenTool)
         self.service = UserService(self.session, self.token_tool)
 
-    # def tearDown for destroy the engine
+    # def tearDown for close and destroy the engine
     def tearDown(self):
         self.session.close()
         self.engine.dispose()
@@ -70,4 +69,3 @@ class UserServiceTests(unittest.TestCase):
         self.token_tool.decode_token.side_effect = jwt.InvalidTokenError("Invalid token")
         result = self.service.get_user_by_access_token("invalid-token")
         self.assertIsNone(result)
-        
