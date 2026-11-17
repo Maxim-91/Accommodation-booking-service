@@ -21,10 +21,18 @@ def get_test_database_url():
     url = os.getenv("TEST_DATABASE_URL")
     if not url:
         return None
-    if not url.startswith(("postgresql://", "postgresql+psycopg://")):
+
+    if not url.startswith((
+        "postgresql://",
+        "postgresql+psycopg://",
+        "postgresql+psycopg2://",
+    )):
+        raise RuntimeError("TEST_DATABASE_URL must point to a dedicated PostgreSQL test database.")
+
+    database_name = url.split("/", 3)[-1].split("?", 1)[0]
+    if not database_name.endswith("_test"):
         raise RuntimeError("TEST_DATABASE_URL must point to a dedicated PostgreSQL test database.")
     return url
-
 
 def create_migrated_test_database():
     url = get_test_database_url()
