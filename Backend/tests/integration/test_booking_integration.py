@@ -68,8 +68,8 @@ class BookingDatabaseIntegrationTests(unittest.TestCase):
             persisted = verification_session.get(Booking, booking_id)
             self.assertIsNotNone(persisted)
             self.assertEqual(persisted.status, "pending")
-            self.assertEqual(persisted.user_id, self.guest.id)
-            self.assertEqual(persisted.accommodation_id, self.accommodation.id)
+            self.assertEqual(persisted.user_id, self.guest_id)
+            self.assertEqual(persisted.accommodation_id, self.accommodation_id)
 
     def test_overlapping_booking_is_rejected_by_service_using_postgresql(self):
         self.service.create_booking(
