@@ -100,3 +100,7 @@ class AccommodationServiceTests(unittest.TestCase):
         request = self.create_accommodation_request(amenity_ids=[9999])
         with self.assertRaises(NotFoundException):
             self.service.create(request, owner_id=self.user.id)
+
+
+if __name__ == "__main__":
+    unittest.main()
