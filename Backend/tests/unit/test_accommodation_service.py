@@ -101,7 +101,7 @@ class AccommodationServiceTests(unittest.TestCase):
         with self.assertRaises(NotFoundException):
             self.service.create(request, owner_id=self.user.id)
 
-            
+
     def create_accommodation_request(self, amenity_ids=None):
         return CreateAccommodationReq(
             title="Test Apartment",
