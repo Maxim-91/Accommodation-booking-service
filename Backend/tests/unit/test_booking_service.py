@@ -105,9 +105,15 @@ class BookingServiceTests(unittest.TestCase):
 
     def test_get_bookings_by_user_returns_only_that_users_bookings(self):
         own_booking = self.create_booking()
-        self.create_booking(user_id=self.other_guest.id)
+        self.create_booking(
+            user_id=self.other_guest.id,
+            check_in=date(2027, 5, 20),
+            check_out=date(2027, 5, 23),
+        )
         result = self.service.get_bookings_by_user(self.guest.id)
-        self.assertEqual([booking.id for booking in result], [own_booking.id])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].id, own_booking.id)
+        self.assertEqual(result[0].user_id, self.guest.id)
 
     def test_cancel_booking_changes_status(self):
         booking = self.create_booking()
