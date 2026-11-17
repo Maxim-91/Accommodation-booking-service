@@ -38,14 +38,18 @@ class BookingDatabaseIntegrationTests(unittest.TestCase):
         )
         self.session.add(self.accommodation)
         self.session.commit()
+        # Save IDs before the session is closed.
+        self.owner_id = self.owner.id
+        self.guest_id = self.guest.id
+        self.second_guest_id = self.second_guest.id
+        self.accommodation_id = self.accommodation.id
 
     def tearDown(self):
-        # Delete only records created by this test, in foreign-key-safe order.
-        self.session.query(Booking).filter(Booking.accommodation_id == self.accommodation.id).delete(synchronize_session=False)
-        self.session.delete(self.accommodation)
-        self.session.delete(self.owner)
-        self.session.delete(self.guest)
-        self.session.delete(self.second_guest)
+        # Delete only records created by this test.
+        self.session.rollback()
+        self.session.query(Booking).filter(Booking.accommodation_id == self.accommodation_id).delete(synchronize_session=False)
+        self.session.query(Accommodation).filter(Accommodation.id == self.accommodation_id).delete(synchronize_session=False)
+        self.session.query(User).filter(User.id.in_([self.owner_id, self.guest_id, self.second_guest_id])).delete(synchronize_session=False)
         self.session.commit()
         self.session.close()
 
