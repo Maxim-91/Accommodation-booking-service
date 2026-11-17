@@ -69,3 +69,7 @@ class UserServiceTests(unittest.TestCase):
         self.token_tool.decode_token.side_effect = jwt.InvalidTokenError("Invalid token")
         result = self.service.get_user_by_access_token("invalid-token")
         self.assertIsNone(result)
+
+
+if __name__ == "__main__":
+    unittest.main()
