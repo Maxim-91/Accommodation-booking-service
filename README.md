@@ -13,6 +13,13 @@ Each course focuses on a different part of the same application and adds its own
 
 ---
 
+## Documentation
+
+- [Backend setup, migrations, API and tests](BackendDoc.md)
+- [Contributing and Git Workflow](CONTRIBUTING.md)
+
+---
+
 ## Full Stack -sovelluskehitys: Frontend
 *(Full Stack Application Development: Frontend)*
 
